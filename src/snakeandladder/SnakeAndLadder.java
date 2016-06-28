@@ -14,9 +14,13 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -92,14 +96,54 @@ JFrame frame;
  JLabel A_label;
  JLabel B_label;
  
+ Icon prevIconA;
+ Icon prevIconB;
+ 
+ int[] snakes;
+ int[] ladders;
+ 
+ int currA,currB;
+ Random random;
+ 
  
 
     public SnakeAndLadder() {
+        init_snakes_ladders();
         createFrame();
         addComponents();
+        
     }
     
    
+    
+    void init_snakes_ladders()
+    {
+        snakes = new int[100];
+        ladders = new int[100];
+        Arrays.fill(snakes, 0, snakes.length, -1);
+        Arrays.fill(ladders,0,ladders.length,-1);
+        snakes[16]=6;
+        snakes[53]=33;
+        snakes[63]=59;
+        snakes[61]=18;
+        snakes[86]=23;
+        snakes[92]=72;
+        snakes[94]=74;
+        snakes[97]=78;
+        
+        ladders[0]=37;
+        ladders[3]=13;
+        ladders[8]=30;
+        ladders[20]=41;
+        ladders[27]=83;
+        ladders[50]=66;
+        ladders[70]=90;
+        ladders[79]=99;
+        
+        currA=-1;
+        currB=-1;
+        random = new Random(System.currentTimeMillis());
+    }
    
  
  
@@ -119,7 +163,7 @@ JFrame frame;
         frame.setVisible(true);
     }
     
-    void addComponents()
+    void addComponents() 
     {
        BufferedImage img=null,A_bufImg=null,B_bufImg=null;
         try {
@@ -181,10 +225,6 @@ JFrame frame;
         
         frame.add(board_Pane);
         
-
-        
-        fragments_label[0].setIcon(A_icon);
-        fragments_label[99].setIcon(B_icon);
        
        
         //-------------------------------------
@@ -196,6 +236,61 @@ JFrame frame;
         frame.add(player_A_button);
         frame.add(player_B_button);
         
+        player_B_button.setEnabled(false);
+        
+        
+        player_A_button.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+               
+               int NUMBER = random.nextInt(6)+1;
+                   
+                   ImageIcon dice_icon = new ImageIcon("Images/"+String.valueOf(NUMBER)+".png");
+                   dice_icon.setImage(dice_icon.getImage().getScaledInstance(200, 200, 1));
+                   dice_label.setIcon(dice_icon);
+                  
+                   if(prevIconA!=null)
+                   fragments_label[currA].setIcon(prevIconA);
+               currA+=NUMBER;
+               if(snakes[currA]!=-1)
+                   currA=snakes[currA];
+               else if(ladders[currA]!=-1)
+                   currA=ladders[currA];
+               
+                    prevIconA= fragments_label[currA].getIcon();
+               
+              
+               fragments_label[currA].setIcon(A_icon);
+               player_A_button.setEnabled(false);
+               player_B_button.setEnabled(true);
+               
+           }
+       });
+        
+        player_B_button.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+               int NUMBER = random.nextInt(6)+1;
+               
+                   ImageIcon dice_icon = new ImageIcon("Images/"+String.valueOf(NUMBER)+".png");
+                   dice_icon.setImage(dice_icon.getImage().getScaledInstance(200, 200, 1));
+                   dice_label.setIcon(dice_icon);
+               if(prevIconB!=null)
+                   fragments_label[currB].setIcon(prevIconB);
+              currB+=NUMBER;  
+               if(snakes[currB]!=-1)
+                   currB=snakes[currB];
+               else if(ladders[currB]!=-1)
+                   currB=ladders[currB];
+               
+              prevIconB= fragments_label[currB].getIcon();
+              
+              
+               fragments_label[currB].setIcon(B_icon);
+               player_B_button.setEnabled(false);
+               player_A_button.setEnabled(true);
+           }
+       });
         //---------------------------
          //---------------------------
         
