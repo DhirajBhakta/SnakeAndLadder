@@ -66,13 +66,8 @@ class ImageManager
            }
         }
         
-        
         return images;
     }
-    
-    
-    
-    
 }
 
 
@@ -86,6 +81,7 @@ class ImageManager
 
 public class SnakeAndLadder 
 {
+    
 JFrame frame;
  JPanel  board_Pane;
  JLabel[] fragments_label;
@@ -95,6 +91,8 @@ JFrame frame;
  
  JLabel A_label;
  JLabel B_label;
+ 
+ 
 
     public SnakeAndLadder() {
         createFrame();
@@ -108,12 +106,14 @@ JFrame frame;
     void createFrame()
     {
         frame = new JFrame();
-        frame.setLayout(null);
+        
+        frame.setLayout(new FlowLayout());
         
         frame.setPreferredSize(new Dimension(1000,600));
         frame.setTitle("Snakes And Ladders!");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
+        frame.getContentPane().setBackground(Color.BLACK);
         frame.pack();
         frame.setResizable(false);
         frame.setVisible(true);
@@ -123,7 +123,7 @@ JFrame frame;
     {
        BufferedImage img=null,A_bufImg=null,B_bufImg=null;
         try {
-        img = ImageIO.read(new File("Images/board.jpg"));
+         img = ImageIO.read(new File("Images/board.jpg"));
          A_bufImg = ImageIO.read(new File("Images/A.png"));
          B_bufImg = ImageIO.read(new File("Images/B.png"));
        
@@ -131,13 +131,12 @@ JFrame frame;
         Logger.getLogger(SnakeAndLadder.class.getName()).log(Level.SEVERE, null, ex);
         }
     
-        
+        //Resize the large board to small one
          BufferedImage resizedImg = new BufferedImage(500, 500, BufferedImage.TRANSLUCENT);
-    Graphics2D g2 = resizedImg.createGraphics();
-    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-    g2.drawImage(img, 0, 0, 500,500,null);
-    g2.dispose();
-    img = resizedImg;
+         Graphics2D g2 = resizedImg.createGraphics();
+         g2.drawImage(img, 0, 0, 500,500,null);
+         g2.dispose();
+         img = resizedImg;
        
        
         ImageIcon A_icon = new ImageIcon(A_bufImg);
@@ -176,27 +175,13 @@ JFrame frame;
         for(i=0;i<=9;i++)
             board_Pane.add(fragments_label[i]);
         
-        //---------------------------
-        
-        dice_label = new JLabel();
-        dice_label.setSize(200, 200);
-        ImageIcon dice_icon = new ImageIcon("Images/nil.png");
-        dice_icon.setImage(dice_icon.getImage().getScaledInstance(200, 200, 1));
-        dice_label.setIcon(dice_icon);
-        dice_label.setBounds(750, 100, 200, 200);
-        frame.add(dice_label);
-        
-        //---------------------------
+       
         
         
-        JFrame j = new JFrame();
-        j.add(board_Pane);
-        j.setLayout(new FlowLayout());
-        j.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        j.add(board_Pane);
-        j.pack();
-        j.setVisible(true);
+        frame.add(board_Pane);
+        
+
         
         fragments_label[0].setIcon(A_icon);
         fragments_label[99].setIcon(B_icon);
@@ -210,6 +195,17 @@ JFrame frame;
         
         frame.add(player_A_button);
         frame.add(player_B_button);
+        
+        //---------------------------
+         //---------------------------
+        
+        dice_label = new JLabel();
+        dice_label.setSize(200, 200);
+        ImageIcon dice_icon = new ImageIcon("Images/nil.png");
+        dice_icon.setImage(dice_icon.getImage().getScaledInstance(200, 200, 1));
+        dice_label.setIcon(dice_icon);
+        dice_label.setBounds(750, 100, 200, 200);
+        frame.add(dice_label);
         
         //---------------------------
         
