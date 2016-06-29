@@ -1,19 +1,11 @@
 
 package snakeandladder;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.ComponentOrientation;
-import java.awt.Image;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -29,6 +21,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 class ImageManager
@@ -89,12 +82,16 @@ public class SnakeAndLadder
 JFrame frame;
  JPanel  board_Pane;
  JLabel[] fragments_label;
+ JLabel[] backup_label;
  JLabel  dice_label;
  JButton player_A_button;
  JButton player_B_button;
  
  JLabel A_label;
  JLabel B_label;
+ 
+ ImageIcon A_icon;
+ ImageIcon B_icon;
  
  Icon prevIconA;
  Icon prevIconB;
@@ -183,19 +180,25 @@ JFrame frame;
          img = resizedImg;
        
        
-        ImageIcon A_icon = new ImageIcon(A_bufImg);
+        A_icon = new ImageIcon(A_bufImg);
         A_icon.setImage(A_icon.getImage().getScaledInstance(img.getWidth()/10,img.getHeight()/10, 0));
         A_label = new JLabel(A_icon);       
         
-        ImageIcon B_icon = new ImageIcon(B_bufImg);
+        B_icon = new ImageIcon(B_bufImg);
         B_icon.setImage(B_icon.getImage().getScaledInstance(img.getWidth()/10,img.getHeight()/10, 0));
         B_label = new JLabel(B_icon);
 
         board_Pane= new JPanel(new GridLayout(10, 10, 3, 3));
         fragments_label = new JLabel[100];
+        backup_label = new JLabel[100];
         BufferedImage[] images = ImageManager.ImageSpitter(img);
+        
         for(int i=0;i<images.length;i++)
-            fragments_label[i] = new JLabel(new ImageIcon(images[i]));
+        {
+         fragments_label[i] = new JLabel(new ImageIcon(images[i]));
+         backup_label[i] = new JLabel(new ImageIcon(images[i]));
+        }
+       
        
         int i;
         for(i=99;i>=90;i--)
@@ -244,25 +247,37 @@ JFrame frame;
            public void actionPerformed(ActionEvent e) {
                
                int NUMBER = random.nextInt(6)+1;
-                   
+                 
                    ImageIcon dice_icon = new ImageIcon("Images/"+String.valueOf(NUMBER)+".png");
                    dice_icon.setImage(dice_icon.getImage().getScaledInstance(200, 200, 1));
                    dice_label.setIcon(dice_icon);
                   
-                   if(prevIconA!=null)
-                   fragments_label[currA].setIcon(prevIconA);
-               currA+=NUMBER;
-               if(snakes[currA]!=-1)
-                   currA=snakes[currA];
-               else if(ladders[currA]!=-1)
-                   currA=ladders[currA];
+                 if(prevIconA!=null)
+                      fragments_label[currA].setIcon(prevIconA);
+                 
+                 if(currA==currB && currA!=-1)
+                 {
+                     fragments_label[currA].setIcon(B_icon);
+                 }
+                 
+                  currA+=NUMBER;
+                   if(snakes[currA]!=-1)
+                      currA=snakes[currA];
+                   else if(ladders[currA]!=-1)
+                      currA=ladders[currA];
+                  if(currA>=99)
+                   end('A');
+                  
                
-                    prevIconA= fragments_label[currA].getIcon();
+                      prevIconA= backup_label[currA].getIcon();
                
               
                fragments_label[currA].setIcon(A_icon);
                player_A_button.setEnabled(false);
                player_B_button.setEnabled(true);
+               
+               
+               
                
            }
        });
@@ -270,25 +285,34 @@ JFrame frame;
         player_B_button.addActionListener(new ActionListener() {
            @Override
            public void actionPerformed(ActionEvent e) {
-               int NUMBER = random.nextInt(6)+1;
+            int NUMBER = random.nextInt(6)+1;
                
                    ImageIcon dice_icon = new ImageIcon("Images/"+String.valueOf(NUMBER)+".png");
                    dice_icon.setImage(dice_icon.getImage().getScaledInstance(200, 200, 1));
                    dice_label.setIcon(dice_icon);
                if(prevIconB!=null)
                    fragments_label[currB].setIcon(prevIconB);
+               
+               if(currA == currB && currB!=-1)
+                   fragments_label[currB].setIcon(A_icon);
+            
               currB+=NUMBER;  
-               if(snakes[currB]!=-1)
+              if(snakes[currB]!=-1)
                    currB=snakes[currB];
                else if(ladders[currB]!=-1)
                    currB=ladders[currB];
+              if(currB>=99)
+                   end('B');
                
-              prevIconB= fragments_label[currB].getIcon();
+               
+              prevIconB= backup_label[currB].getIcon();
               
               
                fragments_label[currB].setIcon(B_icon);
                player_B_button.setEnabled(false);
                player_A_button.setEnabled(true);
+               
+               
            }
        });
         //---------------------------
@@ -306,6 +330,21 @@ JFrame frame;
         
      }
     
+    
+    
+    public void end(char ch)
+    {
+        player_A_button.setEnabled(false);
+        player_B_button.setEnabled(false);
+        if(ch=='A')
+            fragments_label[99].setIcon(A_icon);
+        else
+            fragments_label[99].setIcon(B_icon);
+        JOptionPane.showMessageDialog(board_Pane, ch+" Wins!");
+        currA=-100;
+        currB=-100;
+        
+    }
     
    
 }
